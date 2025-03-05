@@ -1,4 +1,4 @@
-package ${PACKAGE}.infrastructure.adapter.input.rest.controller;
+package ${PACKAGE}.infrastructure.adapter.input.controller;
 
 import ${PACKAGE}.application.dto.request.${FEATURE}Request;
 import ${PACKAGE}.application.dto.response.${FEATURE}Response;

@@ -2,12 +2,27 @@
   "name": "hexagonal-feature-generator",
   "displayName": "Hexagonal Feature Generator",
   "description": "Generates the hexagonal structure for an entity",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "publisher": "Nicolas-Andres-Munoz",
   "repository": {
     "type": "git",
     "url": "https://github.com/nick130920/hexagonal-feature-generator"
   },  
+  "license": "MIT",
+  "icon": "assets/hexagonal.jpg",
+  "screenshots": [
+    {
+      "path": "assets/screenshot1.png",
+      "caption": "Ejemplo de uso de la extensión"
+    }
+  ],
+  "keywords": [
+    "hexagonal",
+    "architecture",
+    "generator",
+    "spring-boot",
+    "java"
+  ],
   "engines": {
     "vscode": "^1.75.0"
   },

@@ -64,7 +64,7 @@ async function createExampleEntity() {
     }
 
     const projectRoot = workspaceFolders[0].uri.fsPath;
-    const exampleEntityPath = path.join(projectRoot, 'src', 'main', 'java', 'com', 'example', 'domain', 'model', 'ExampleEntity.java');
+    const exampleEntityPath = path.join(projectRoot, 'src', 'main', 'java', 'com', 'example', 'domain', 'model', 'Example.java');
 
     const exampleEntityContent = `
 		package com.example.domain.model;
@@ -77,7 +77,7 @@ async function createExampleEntity() {
 
 		@Entity
 		@Data
-		public class ExampleEntity {
+		public class Example {
 			@Id
 			@GeneratedValue(strategy = GenerationType.IDENTITY)
 			private Long id;

@@ -3,6 +3,7 @@
 **Hexagonal Feature Generator** es una extensión para Visual Studio Code que permite generar automáticamente una estructura basada en la arquitectura hexagonal a partir de una entidad en un proyecto Java con Spring Boot.
 
 ## 🚀 Características
+
 - 🔹 **Generación automática de estructura hexagonal** basada en una entidad Java.
 - 🔹 **Soporte para GraphQL y REST API**, permitiendo al usuario elegir el tipo de controlador.
 - 🔹 **Verificación de entidad existente** y opción para crear una entidad de ejemplo si no hay ninguna disponible.
@@ -17,16 +18,20 @@
 - 🔹 **Integración con el menú contextual del explorador de archivos** para facilitar la generación de la estructura.
 
 ## 🛠 Instalación
+
 1. Descarga la extensión desde el [Visual Studio Code Marketplace](https://marketplace.visualstudio.com/).
 2. Instala la extensión en VS Code.
 3. ¡Listo! Ya puedes generar estructuras hexagonales fácilmente.
 
 ## 📌 Requisitos
+
 - VS Code 1.75.0 o superior.
 - Proyecto Java con estructura **Maven** o **Gradle**.
-- Se recomienda el uso de **Spring Boot** con **Lombok** para una mejor compatibilidad.
+- Se recomienda el uso de **Spring Boot** con **Lombok**, **JPA** y **MapStruct** para una mejor compatibilidad.
+- La entidad debe estar en el paquete `domain.model` del proyecto para evitar problemas de ubicación de paquetes.
 
 ## 📖 Uso
+
 1. **Abre un archivo de entidad Java** en el editor de VS Code.
 2. **Ejecuta el comando** `Generate Hexagonal Structure` desde:
    - El menú contextual del explorador de archivos (clic derecho en la entidad).
@@ -36,14 +41,17 @@
 4. **La estructura se generará automáticamente** en la ubicación correcta dentro del proyecto.
 
 ### 🆕 ¿No tienes una entidad?
-Si no tienes una entidad abierta, la extensión te preguntará si deseas generar una **entidad de ejemplo** con una estructura básica en `src/main/java/com/example/domain/model/ExampleEntity.java`.
+
+Si no tienes una entidad abierta, la extensión te preguntará si deseas generar una **entidad de ejemplo** con una estructura básica en `src/main/java/com/example/domain/model/Example.java`.
+Luego puedes generar la estructura hexagonal con la entidad de ejemplo.
 
 ---
 
 ## 📂 Estructura Generada
+
 Dependiendo de la opción seleccionada, la extensión creará la siguiente estructura:
 
-```
+```text
 src/main/java/com/example/
 ├── application/
 │   ├── dto/
@@ -80,10 +88,13 @@ src/main/java/com/example/
 ---
 
 ## 🔧 Configuración Avanzada
+
 Esta extensión permite personalizar la generación de la estructura hexagonal:
 
 ### 🔹 Elección del tipo de API
+
 Puedes establecer el tipo de API por defecto desde la configuración de VS Code:
+
 1. Abre **Configuración** (`Ctrl + ,` o `Cmd + ,` en macOS).
 2. Busca `hexagonalFeatureGenerator.apiType`.
 3. Selecciona `"graphql"` o `"rest"` según el tipo de API que prefieras generar por defecto.
@@ -91,15 +102,17 @@ Puedes establecer el tipo de API por defecto desde la configuración de VS Code:
 También puedes cambiar la opción en cada generación mediante el menú interactivo.
 
 ### 🔹 Limpieza dinámica del package name
+
 La extensión detecta automáticamente la ubicación de la entidad y limpia paquetes innecesarios como `.domain.model`, asegurando que la generación sea flexible para diferentes estructuras de proyectos.
 
 ---
 
 ## 🛠 Contribuciones
+
 Si encuentras algún problema o tienes sugerencias para mejorar la extensión, abre un [issue en GitHub](https://github.com/nick130920/hexagonal-feature-generator/issues).
 
 ---
 
 ## 📜 Licencia
-Este proyecto está bajo la licencia **MIT**.
 
+Este proyecto está bajo la licencia **MIT**.

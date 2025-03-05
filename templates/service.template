@@ -1,0 +1,128 @@
+package ${PACKAGE}.application.service;
+
+import ${PACKAGE}.application.dto.request.${FEATURE}Request;
+import ${PACKAGE}.application.dto.response.${FEATURE}Response;
+import ${PACKAGE}.application.mapper.${FEATURE}Mapper;
+import ${PACKAGE}.application.port.input.${FEATURE}UseCase;
+import ${PACKAGE}.application.port.output.${FEATURE}RepositoryPort;
+import ${PACKAGE}.application.exception.${FEATURE}NotFoundException;
+import ${PACKAGE}.domain.model.${FEATURE};
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Service implementation for managing ${FEATURE_LOWER}s.
+ */
+@Service
+@RequiredArgsConstructor
+public class ${FEATURE}Service implements ${FEATURE}UseCase {
+
+    private final ${FEATURE}RepositoryPort ${FEATURE_LOWER}RepositoryPort;
+    private final ${FEATURE}Mapper ${FEATURE_LOWER}Mapper;
+
+    /**
+     * Creates a new ${FEATURE_LOWER}.
+     *
+     * @param ${FEATURE_LOWER}Request the ${FEATURE_LOWER} request input
+     * @return the created ${FEATURE_LOWER} response
+     * @throws IllegalArgumentException if the request is null
+     */
+    @Override
+    @Transactional
+    public ${FEATURE}Response create${FEATURE}(${FEATURE}Request ${FEATURE_LOWER}Request) {
+        if (${FEATURE_LOWER}Request == null) {
+            throw new IllegalArgumentException("${FEATURE}Request cannot be null");
+        }
+
+        ${FEATURE} ${FEATURE_LOWER} = ${FEATURE_LOWER}Mapper.toEntity(${FEATURE_LOWER}Request);
+        ${FEATURE_LOWER} = ${FEATURE_LOWER}RepositoryPort.save(${FEATURE_LOWER});
+
+        return ${FEATURE_LOWER}Mapper.toDto(${FEATURE_LOWER});
+    }
+
+    /**
+     * Creates multiple ${FEATURE_LOWER}s.
+     *
+     * @param ${FEATURE_LOWER}Requests the list of ${FEATURE_LOWER} requests
+     * @return the list of created ${FEATURE_LOWER} responses
+     * @throws IllegalArgumentException if the request list is null or empty
+     */
+    @Override
+    @Transactional
+    public List<${FEATURE}Response> create${FEATURE}s(List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
+        if (${FEATURE_LOWER}Requests == null || ${FEATURE_LOWER}Requests.isEmpty()) {
+            throw new IllegalArgumentException("${FEATURE}Requests cannot be null or empty");
+        }
+
+        List<${FEATURE}> ${FEATURE_LOWER}s = ${FEATURE_LOWER}Requests.stream()
+                .map(${FEATURE_LOWER}Mapper::toEntity)
+                .collect(Collectors.toList());
+
+        ${FEATURE_LOWER}s = ${FEATURE_LOWER}RepositoryPort.saveAll(${FEATURE_LOWER}s);
+
+        return ${FEATURE_LOWER}Mapper.toDtoList(${FEATURE_LOWER}s);
+    }
+
+    /**
+     * Retrieves all ${FEATURE_LOWER}s.
+     *
+     * @return the list of ${FEATURE_LOWER} responses
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<${FEATURE}Response> findAll() {
+        return ${FEATURE_LOWER}RepositoryPort.findAll().stream()
+                .map(${FEATURE_LOWER}Mapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Finds a ${FEATURE_LOWER} by ID.
+     *
+     * @param id the ${FEATURE_LOWER} ID
+     * @return the found ${FEATURE_LOWER} response
+     * @throws ${FEATURE}NotFoundException if the ${FEATURE_LOWER} is not found
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public ${FEATURE}Response findById(Long id) {
+        return ${FEATURE_LOWER}RepositoryPort.findById(id)
+                .map(${FEATURE_LOWER}Mapper::toDto)
+                .orElseThrow(() -> new ${FEATURE}NotFoundException("${FEATURE} not found with ID: " + id));
+    }
+
+    /**
+     * Updates a ${FEATURE_LOWER}.
+     *
+     * @param request the ${FEATURE_LOWER} request
+     * @return the updated ${FEATURE_LOWER} response
+     * @throws ${FEATURE}NotFoundException if the ${FEATURE_LOWER} is not found
+     */
+    @Override
+    @Transactional
+    public ${FEATURE}Response update${FEATURE}(${FEATURE}Request request) {
+        ${FEATURE_LOWER}RepositoryPort.findById(request.getId())
+                .orElseThrow(() -> new ${FEATURE}NotFoundException("${FEATURE} not found with ID: " + request.getId()));
+
+
+        ${FEATURE} saved = ${FEATURE_LOWER}RepositoryPort.save(${FEATURE_LOWER}Mapper.toEntity(request));
+
+        return ${FEATURE_LOWER}Mapper.toDto(saved);
+    }
+
+    /**
+     * Deletes a ${FEATURE_LOWER} by ID.
+     *
+     * @param id the ${FEATURE_LOWER} ID
+     * @throws ${FEATURE}NotFoundException if the ${FEATURE_LOWER} is not found
+     */
+    @Override
+    @Transactional
+    public void delete${FEATURE}(Long id) {
+        ${FEATURE_LOWER}RepositoryPort.deleteById(id);
+    }
+}

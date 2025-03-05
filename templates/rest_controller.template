@@ -1,0 +1,108 @@
+package ${PACKAGE}.infrastructure.adapter.input.rest.controller;
+
+import ${PACKAGE}.application.dto.request.${FEATURE}Request;
+import ${PACKAGE}.application.dto.response.${FEATURE}Response;
+import ${PACKAGE}.application.port.input.${FEATURE}UseCase;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * REST controller for managing ${FEATURE} entities.
+ * Provides endpoints for CRUD operations and bulk creation.
+ * 
+ * Endpoints:
+ * - GET /api/${FEATURE_LOWER}/{id}: Retrieve a ${FEATURE} by its ID.
+ * - GET /api/${FEATURE_LOWER}: Retrieve all ${FEATURE} entities.
+ * - POST /api/${FEATURE_LOWER}: Create a new ${FEATURE}.
+ * - POST /api/${FEATURE_LOWER}/bulk: Create multiple ${FEATURE} entities in bulk.
+ * - PUT /api/${FEATURE_LOWER}/{id}: Update an existing ${FEATURE} by its ID.
+ * - DELETE /api/${FEATURE_LOWER}/{id}: Delete a ${FEATURE} by its ID.
+ * 
+ * Dependencies:
+ * - ${FEATURE}UseCase: Use case service for ${FEATURE} operations.
+ * 
+ * Annotations:
+ * - @RestController: Indicates that this class is a REST controller.
+ * - @RequestMapping: Maps HTTP requests to handler methods of this controller.
+ * - @RequiredArgsConstructor: Generates a constructor with required arguments.
+ * - @Slf4j: Enables logging.
+ */
+@RestController
+@RequestMapping("/api/${FEATURE_LOWER}")
+@RequiredArgsConstructor
+@Slf4j
+public class ${FEATURE}RestController {
+
+    private final ${FEATURE}UseCase ${FEATURE_LOWER}UseCase;
+
+    /**
+     * Retrieves a ${FEATURE} by its ID.
+     * 
+     * @param id the ${FEATURE} ID
+     * @return the found ${FEATURE} response
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<${FEATURE}Response> get${FEATURE}(@PathVariable Long id) {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.findById(id));
+    }
+
+    /**
+     * Retrieves all ${FEATURE}s.
+     * 
+     * @return the list of ${FEATURE} responses
+     */
+    @GetMapping
+    public ResponseEntity<List<${FEATURE}Response>> getAll${FEATURE}s() {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.findAll());
+    }
+
+    /**
+     * Creates a new ${FEATURE}.
+     * 
+     * @param ${FEATURE_LOWER}Request the ${FEATURE} request
+     * @return the created ${FEATURE} response
+     */
+    @PostMapping
+    public ResponseEntity<${FEATURE}Response> create${FEATURE}(@RequestBody ${FEATURE}Request ${FEATURE_LOWER}Request) {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.create${FEATURE}(${FEATURE_LOWER}Request));
+    }
+
+    /**
+     * Endpoint to create multiple ${FEATURE}s in bulk.
+     * 
+     * @param ${FEATURE_LOWER}Requests List of ${FEATURE}Request objects to create.
+     * @return List of created ${FEATURE}Response objects.
+     */
+    @PostMapping("/bulk")
+    public ResponseEntity<List<${FEATURE}Response>> create${FEATURE}s(@RequestBody List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.create${FEATURE}s(${FEATURE_LOWER}Requests));
+    }
+
+    /**
+     * Updates a ${FEATURE} by its ID.
+     * 
+     * @param id the ${FEATURE} ID
+     * @param ${FEATURE_LOWER}Request the ${FEATURE} request
+     * @return the updated ${FEATURE} response
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<${FEATURE}Response> update${FEATURE}(@PathVariable Long id, @RequestBody ${FEATURE}Request ${FEATURE_LOWER}Request) {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.update${FEATURE}(id, ${FEATURE_LOWER}Request));
+    }
+
+    /**
+     * Deletes a ${FEATURE} by its ID.
+     * 
+     * @param id the ${FEATURE} ID
+     * @return 204 No Content response
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete${FEATURE}(@PathVariable Long id) {
+        ${FEATURE_LOWER}UseCase.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}

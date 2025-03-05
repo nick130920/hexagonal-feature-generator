@@ -1,0 +1,50 @@
+package ${PACKAGE}.application.mapper;
+
+import ${PACKAGE}.application.dto.request.${FEATURE}Request;
+import ${PACKAGE}.application.dto.response.${FEATURE}Response;
+import ${PACKAGE}.domain.model.${FEATURE};
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
+import java.util.List;
+
+/**
+ * Mapper interface for converting between ${FEATURE} entities and DTOs.
+ * This interface uses MapStruct for automatic implementation generation.
+ * 
+ * @componentModel spring - Indicates that the generated implementation should be a Spring bean.
+ * 
+ * Methods:
+ * - toEntity(${FEATURE}Request dto): Converts a ${FEATURE}Request DTO to a ${FEATURE} entity.
+ * - toDto(${FEATURE} ${FEATURE_LOWER}): Converts a ${FEATURE} entity to a ${FEATURE}Response DTO.
+ * - toDtoList(List<${FEATURE}> ${FEATURE_LOWER}): Converts a list of ${FEATURE} entities to a list of ${FEATURE}Response DTOs.
+ */
+@Mapper(componentModel = "spring")
+public interface ${FEATURE}Mapper {
+
+    ${FEATURE}Mapper INSTANCE = Mappers.getMapper(${FEATURE}Mapper.class);
+
+    /**
+     * Converts a ${FEATURE}Request DTO to a ${FEATURE} entity.
+     *
+     * @param dto the ${FEATURE}Request DTO
+     * @return the converted ${FEATURE} entity
+     */
+    ${FEATURE} toEntity(${FEATURE}Request dto);
+
+    /**
+     * Converts a ${FEATURE} entity to a ${FEATURE}Response DTO.
+     *
+     * @param ${FEATURE_LOWER} the ${FEATURE} entity
+     * @return the converted ${FEATURE}Response DTO
+     */
+    ${FEATURE}Response toDto(${FEATURE} ${FEATURE_LOWER});
+
+    /**
+     * Converts a list of ${FEATURE} entities to a list of ${FEATURE}Response DTOs.
+     *
+     * @param ${FEATURE_LOWER} the list of ${FEATURE} entities
+     * @return the converted list of ${FEATURE}Response DTOs
+     */
+    List<${FEATURE}Response> toDtoList(List<${FEATURE}> ${FEATURE_LOWER});
+}

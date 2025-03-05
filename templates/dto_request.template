@@ -1,0 +1,10 @@
+package ${PACKAGE}.application.dto.request;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class ${FEATURE}Request {
+${FIELDS}
+}

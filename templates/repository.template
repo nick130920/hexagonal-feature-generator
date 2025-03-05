@@ -1,0 +1,81 @@
+package ${PACKAGE}.infrastructure.adapter.output.persistence;
+
+import ${PACKAGE}.application.port.output.${FEATURE}RepositoryPort;
+import ${PACKAGE}.domain.model.${FEATURE};
+import ${PACKAGE}.infrastructure.adapter.output.persistence.jparepository.SpringData${FEATURE}Repository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * This class implements the {@link ${FEATURE}RepositoryPort} interface using Spring Data JPA.
+ */
+@Repository
+public class ${FEATURE}Repository implements ${FEATURE}RepositoryPort {
+
+	private final SpringData${FEATURE}Repository springData${FEATURE}Repository;
+
+	/**
+	 * Constructs a new instance of {@link ${FEATURE}Repository}.
+	 *
+	 * @param springData${FEATURE}Repository the Spring Data JPA repository for {@link ${FEATURE}}
+	 */
+	public ${FEATURE}Repository(SpringData${FEATURE}Repository springData${FEATURE}Repository) {
+		this.springData${FEATURE}Repository = springData${FEATURE}Repository;
+	}
+
+	/**
+	 * Saves a list of ${FEATURE}s to the repository.
+	 *
+	 * @param ${FEATURE}s the list of ${FEATURE}s to be saved
+	 * @return the list of saved ${FEATURE}s
+	 */
+	@Override
+	public List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_LOWER}s) {
+		return springData${FEATURE}Repository.saveAll(${FEATURE_LOWER}s);
+	}
+
+	/**
+	 * Saves a ${FEATURE} to the repository.
+	 *
+	 * @param ${FEATURE_LOWER} the ${FEATURE} to be saved
+	 * @return the saved ${FEATURE}
+	 */
+	@Override
+	public ${FEATURE} save(${FEATURE} ${FEATURE_LOWER}) {
+		return springData${FEATURE}Repository.save(${FEATURE_LOWER});
+	}
+
+	/**
+	 * Returns a list of all ${FEATURE}s in the repository.
+	 *
+	 * @return a list of all ${FEATURE}s
+	 */
+	@Override
+	public List<${FEATURE}> findAll() {
+		return springData${FEATURE}Repository.findAll();
+	}
+
+	/**
+	 * Returns a ${FEATURE} by its ID if the ${FEATURE} exists in the repository.
+	 *
+	 * @param id the ID of the ${FEATURE} to be found
+	 * @return an optional containing the ${FEATURE} if found, empty otherwise
+	 */
+	@Override
+	public Optional<${FEATURE}> findById(Long id) {
+		return springData${FEATURE}Repository.findById(id);
+	}
+
+	/**
+	 * Deletes a ${FEATURE} by its ID.
+	 *
+	 * @param id the ID of the ${FEATURE} to be deleted
+	 */
+	@Override
+	public void deleteById(Long id) {
+		springData${FEATURE}Repository.deleteById(id);
+	}
+
+}

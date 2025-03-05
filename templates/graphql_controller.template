@@ -1,0 +1,100 @@
+package ${PACKAGE}.infrastructure.adapter.input.graphql.controller;
+
+import ${PACKAGE}.application.dto.request.${FEATURE}Request;
+import ${PACKAGE}.application.dto.response.${FEATURE}Response;
+import ${PACKAGE}.application.port.input.${FEATURE}UseCase;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
+
+import java.util.List;
+
+/**
+ * GraphQL controller for ${FEATURE}.
+ *
+ * This controller handles GraphQL requests for the ${FEATURE} feature.
+ * It uses Spring's @Controller annotation to define a web controller,
+ * and Lombok's @RequiredArgsConstructor to generate a constructor with required arguments.
+ * The @Slf4j annotation is used for logging.
+ */
+ * 
+ */
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class ${FEATURE}GraphQlController {
+
+	private final ${FEATURE}UseCase ${FEATURE_LOWER}UseCase;
+
+
+	/**
+	 * Retrieves a single ${FEATURE} by ID.
+	 *
+	 * @param id the ${FEATURE} ID
+	 * @return the found ${FEATURE} response
+	 */
+	@QueryMapping
+	public ${FEATURE}Response ${FEATURE_LOWER}(@Argument Long id) {
+		return ${FEATURE_LOWER}UseCase.findById(id);
+	}
+
+	/**
+	 * Retrieves all ${FEATURE}s.
+	 *
+	 * @return the list of ${FEATURE} responses
+	 */
+	@QueryMapping
+	public List<${FEATURE}Response> ${FEATURE_LOWER}s() {
+		return ${FEATURE_LOWER}UseCase.findAll();
+	}
+
+	/**
+	 * Creates a new ${FEATURE}.
+	 *
+	 * @param ${FEATURE_LOWER}Request the ${FEATURE} request
+	 * @return the created ${FEATURE} response
+	 */
+	@MutationMapping
+	public ${FEATURE}Response create${FEATURE}(@Argument ${FEATURE}Request ${FEATURE_LOWER}Request) {
+		return ${FEATURE_LOWER}UseCase.create${FEATURE}(${FEATURE_LOWER}Request);
+	}
+
+	/**
+	 * Creates multiple ${FEATURE}s.
+	 *
+	 * @param ${FEATURE_LOWER}Request the list of ${FEATURE} requests
+	 * @return the list of created ${FEATURE} responses
+	 */
+	@MutationMapping
+	public List<${FEATURE}Response> create${FEATURE}s(@Argument List<${FEATURE}Request> ${FEATURE_LOWER}Request) {
+		return ${FEATURE_LOWER}UseCase.create${FEATURE}s(${FEATURE_LOWER}Request);
+	}
+
+	/**
+	 * Updates an existing ${FEATURE}.
+	 *
+	 * @param ${FEATURE_LOWER}Request the ${FEATURE} request
+	 * @return the updated ${FEATURE} response
+	 */
+	@MutationMapping
+	public ${FEATURE}Response update${FEATURE}(@Argument ${FEATURE}Request ${FEATURE_LOWER}Request) {
+		return ${FEATURE_LOWER}UseCase.update${FEATURE}(${FEATURE_LOWER}Request);
+	}
+
+	/**
+	 * Deletes a ${FEATURE} by ID.
+	 *
+	 * @param id the ${FEATURE} ID
+	 * @return true if the ${FEATURE} was deleted, false otherwise
+	 */
+	@MutationMapping
+	public Boolean delete${FEATURE}(@Argument Long id) {
+		${FEATURE_LOWER}UseCase.delete${FEATURE}(id);
+		return true;
+	}
+
+}
+

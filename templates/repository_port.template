@@ -1,0 +1,47 @@
+package ${PACKAGE}.application.port.output;
+
+import ${PACKAGE}.domain.model.${FEATURE};
+
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * Output port for ${FEATURE} repository.
+ *
+ * @author Firstname Lastname
+ */
+public interface ${FEATURE}RepositoryPort {
+	/**
+	 * Save all ${FEATURE}s.
+	 *
+	 * @param ${FEATURE_LOWER}s the ${FEATURE}s to save
+	 * @return the saved ${FEATURE}s
+	 */
+	List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_LOWER}s);
+	/**
+	 * Save a ${FEATURE}.
+	 *
+	 * @param ${FEATURE_LOWER} the ${FEATURE} to save
+	 * @return the saved ${FEATURE}
+	 */
+	${FEATURE} save(${FEATURE} ${FEATURE_LOWER});
+	/**
+	 * Get all ${FEATURE_LOWER}s.
+	 *
+	 * @return all ${FEATURE}s
+	 */
+	List<${FEATURE}> findAll();
+	/**
+	 * Find a ${FEATURE} by id.
+	 *
+	 * @param id the id of the ${FEATURE}
+	 * @return the ${FEATURE} if found, optional empty if not found
+	 */
+	Optional<${FEATURE}> findById(Long id);
+	/**
+	 * Delete a ${FEATURE} by id.
+	 *
+	 * @param id the id of the ${FEATURE}
+	 */
+	void deleteById(Long id);
+}

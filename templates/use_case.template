@@ -1,0 +1,63 @@
+package ${PACKAGE}.application.port.input;
+
+import ${PACKAGE}.application.dto.request.${FEATURE}Request;
+import ${PACKAGE}.application.dto.response.${FEATURE}Response;
+import ${PACKAGE}.domain.model.${FEATURE};
+
+import java.util.List;
+
+public interface ${FEATURE}UseCase {
+
+    /**
+        * Find a ${FEATURE} by id.
+        *
+        * @param id a id
+        * @return a ${FEATURE}Response
+    */
+	${FEATURE}Response findById(Long id);
+
+	/**
+    	 * Get a list of all ${FEATURE}s.
+    	 *
+    	 * @return a list of ${FEATURE}Responses
+    */
+    List<${FEATURE}Response> findAll();
+
+	/**
+	 * Create a list of ${FEATURE}s.
+	 *
+	 * @param requests a list of ${FEATURE}Requests
+	 * @return a list of ${FEATURE}Responses
+	 */
+	List<${FEATURE}Response> create${FEATURE}s(List<${FEATURE}Request> requests);
+
+	/**
+	 * Create a ${FEATURE}.
+	 *
+	 * @param ${FEATURE_LOWER}Request a ${FEATURE}Request
+	 * @return a ${FEATURE}Response
+	 */
+	${FEATURE}Response create${FEATURE}(${FEATURE}Request ${FEATURE_LOWER}Request);
+
+
+
+	/**
+	 * Update a ${FEATURE}.
+	 *
+	 * @param request a ${FEATURE}Request
+	 * @return a ${FEATURE}Response
+	 */
+	${FEATURE}Response update${FEATURE}(${FEATURE}Request request);
+
+    /**
+         * Delete a ${FEATURE}.
+         *
+         * @param id an id
+     */
+	void delete${FEATURE}(Long id);
+
+
+
+
+
+}

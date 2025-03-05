@@ -1,0 +1,7 @@
+package ${PACKAGE}.application.exception;
+
+public class ${FEATURE}NotFoundException extends RuntimeException {
+    public ${FEATURE}NotFoundException(String message) {
+        super(message);
+    }
+}

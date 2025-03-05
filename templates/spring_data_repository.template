@@ -1,0 +1,7 @@
+package ${PACKAGE}.infrastructure.adapter.output.persistence.jparepository;
+
+import ${PACKAGE}.domain.model.${FEATURE};
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SpringData${FEATURE}Repository extends JpaRepository<${FEATURE}, Long> {
+}

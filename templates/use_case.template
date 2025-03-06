@@ -54,7 +54,7 @@ public interface ${FEATURE}UseCase {
          *
          * @param id an id
      */
-	void delete${FEATURE}(Long id);
+	void deleteById(Long id);
 
 
 

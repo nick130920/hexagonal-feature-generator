@@ -91,7 +91,7 @@ public class ${FEATURE}RestController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<${FEATURE}Response> update${FEATURE}(@PathVariable Long id, @RequestBody ${FEATURE}Request ${FEATURE_LOWER}Request) {
-        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.update${FEATURE}(id, ${FEATURE_LOWER}Request));
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.update${FEATURE}(${FEATURE_LOWER}Request));
     }
 
     /**

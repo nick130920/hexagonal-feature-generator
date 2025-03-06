@@ -122,7 +122,7 @@ public class ${FEATURE}Service implements ${FEATURE}UseCase {
      */
     @Override
     @Transactional
-    public void delete${FEATURE}(Long id) {
+    public void deleteById(Long id) {
         ${FEATURE_LOWER}RepositoryPort.deleteById(id);
     }
 }

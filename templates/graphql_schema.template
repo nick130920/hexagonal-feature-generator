@@ -1,0 +1,32 @@
+# Schema de GraphQL generado automáticamente para la entidad ${FEATURE}
+
+# Tipo principal que representa la entidad ${FEATURE}
+type ${FEATURE} {
+${FIELDS}
+}
+
+# Consultas disponibles para la entidad ${FEATURE}
+type Query {
+    # Obtiene un ${FEATURE} por su ID
+    get${FEATURE}(id: ID!): ${FEATURE}
+
+    # Obtiene todos los ${FEATURE}s
+    getAll${FEATURE}s: [${FEATURE}]
+}
+
+# Mutaciones disponibles para la entidad ${FEATURE}
+type Mutation {
+    # Crea un nuevo ${FEATURE}
+    create${FEATURE}(input: ${FEATURE}Input!): ${FEATURE}
+
+    # Actualiza un ${FEATURE} existente
+    update${FEATURE}(id: ID!, input: ${FEATURE}Input!): ${FEATURE}
+
+    # Elimina un ${FEATURE} por su ID
+    delete${FEATURE}(id: ID!): Boolean
+}
+
+# Input type para crear o actualizar un ${FEATURE}
+input ${FEATURE}Input {
+${FIELDS}
+}

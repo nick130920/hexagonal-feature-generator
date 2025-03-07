@@ -144,6 +144,7 @@ async function generateHexagonalStructure(projectRoot: string, entityName: strin
     await generateFile(projectRoot, 'infrastructure/adapter/output/persistence/jparepository', `SpringData${entityName}Repository.java`, 'spring_data_repository.template', packageName, entityName, attributes);
     
 	if (apiType === 'graphql') {
+        await generateGraphQLSchema(projectRoot, packageName, entityName, attributes);
 		await generateFile(projectRoot, 'infrastructure/adapter/input/graphql/controller', `${entityName}GraphQlController.java`, 'graphql_controller.template', packageName, entityName, attributes);
 	} else {
 		await generateFile(projectRoot, 'infrastructure/adapter/input/controller', `${entityName}RestController.java`, 'rest_controller.template', packageName, entityName, attributes);
@@ -203,6 +204,47 @@ function cleanPackageName(packageName: string): string {
         .split('.')
         .filter(part => part !== 'domain' && part !== 'model')
         .join('.');
+}
+
+async function generateGraphQLSchema(projectRoot: string, packageName: string, entityName: string, attributes: Array<{ type: string; name: string }>) {
+    const templatePath = path.join(__dirname, '..', 'templates', 'graphql_schema.template');
+    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+
+    // Procesa la plantilla
+    const fields = attributes.map(attr => `    ${attr.name}: ${mapJavaTypeToGraphQLType(attr.type)}`).join('\n');
+    const processedContent = templateContent
+        .replace(/\${FEATURE}/g, entityName)
+        .replace(/\${FIELDS}/g, fields);
+
+    // Define la ruta del archivo generado
+    const fullPath = path.join(projectRoot, 'src', 'main', 'resources', 'graphql', `${entityName}.graphqls`);
+
+    // Crea el directorio si no existe
+    const dir = path.dirname(fullPath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    // Escribe el archivo generado
+    fs.writeFileSync(fullPath, processedContent, 'utf-8');
+}
+
+function mapJavaTypeToGraphQLType(javaType: string): string {
+    switch (javaType.toLowerCase()) {
+        case 'string':
+            return 'String';
+        case 'int':
+        case 'integer':
+        case 'long':
+            return 'Int';
+        case 'double':
+        case 'float':
+            return 'Float';
+        case 'boolean':
+            return 'Boolean';
+        default:
+            return 'String'; // Tipo por defecto
+    }
 }
 
 

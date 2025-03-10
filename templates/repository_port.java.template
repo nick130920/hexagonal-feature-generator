@@ -12,12 +12,12 @@ import java.util.Optional;
  */
 public interface ${FEATURE}RepositoryPort {
 	/**
-	 * Save all ${FEATURE}s.
+	 * Save all ${FEATURE_PLURAL}.
 	 *
-	 * @param ${FEATURE_LOWER}s the ${FEATURE}s to save
-	 * @return the saved ${FEATURE}s
+	 * @param ${FEATURE_PLURAL} the ${FEATURE_PLURAL} to save
+	 * @return the saved ${FEATURE_PLURAL}
 	 */
-	List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_LOWER}s);
+	List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_PLURAL});
 	/**
 	 * Save a ${FEATURE}.
 	 *
@@ -26,9 +26,9 @@ public interface ${FEATURE}RepositoryPort {
 	 */
 	${FEATURE} save(${FEATURE} ${FEATURE_LOWER});
 	/**
-	 * Get all ${FEATURE_LOWER}s.
+	 * Get all ${FEATURE_PLURAL}.
 	 *
-	 * @return all ${FEATURE}s
+	 * @return all ${FEATURE_PLURAL}
 	 */
 	List<${FEATURE}> findAll();
 	/**

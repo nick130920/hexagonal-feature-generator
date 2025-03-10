@@ -4,10 +4,11 @@
 
 ## 🚀 Características
 
-- 🔹 **Generación automática de estructura hexagonal** basada en una entidad Java.
-- 🔹 **Soporte para GraphQL y REST API**, permitiendo al usuario elegir el tipo de controlador.
-- 🔹 **Verificación de entidad existente** y opción para crear una entidad de ejemplo si no hay ninguna disponible.
-- 🔹 **Generación de los siguientes componentes**:
+- **Generación automática de estructura hexagonal** basada en una entidad Java.
+- **Soporte para GraphQL y REST API**, permitiendo al usuario elegir el tipo de controlador.
+- **Opción de habilitar o deshabilitar Swagger** en los controladores REST.
+- **Verificación de entidad existente** y opción para crear una entidad de ejemplo si no hay ninguna disponible.
+- **Generación de los siguientes componentes**:
   - DTOs (Request y Response)
   - Mappers
   - Servicios
@@ -15,7 +16,9 @@
   - Puertos de entrada y salida
   - Repositorios y adaptadores de persistencia
   - Controladores GraphQL o REST (según elección del usuario)
-- 🔹 **Integración con el menú contextual del explorador de archivos** para facilitar la generación de la estructura.
+- **Integración con el menú contextual del explorador de archivos** para facilitar la generación de la estructura.
+
+---
 
 ## 🛠 Instalación
 
@@ -23,12 +26,36 @@
 2. Instala la extensión en VS Code.
 3. ¡Listo! Ya puedes generar estructuras hexagonales fácilmente.
 
+---
+
 ## 📌 Requisitos
 
-- VS Code 1.75.0 o superior.
+- VS Code `1.75.0` o superior.
 - Proyecto Java con estructura **Maven** o **Gradle**.
-- Se recomienda el uso de **Spring Boot** con **Lombok**, **JPA** y **MapStruct** para una mejor compatibilidad.
+- Se recomienda el uso de **Spring Boot** con **Lombok**, **JPA**, **MapStruct** y **Swagger** para una mejor compatibilidad.
 - La entidad debe estar en el paquete `domain.model` del proyecto para evitar problemas de ubicación de paquetes.
+- Si deseas generar un controlador REST, la extensión verificará si deseas habilitar la generación con Swagger, para esto debes tener las dependencias `springdoc-openapi-started-webmvc-ui`. Agrega las dependencias en tu archivo `pom.xml` o `build.gradle`.
+Si usas maven, agrega las dependencias en tu archivo `pom.xml`:
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        <version>{{version}}</version>
+    </dependency>
+</dependencies>
+```
+
+Si usas gradle, agrega las dependencias en tu archivo `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:{{version}}'
+}
+```
+
+---
 
 ## 📖 Uso
 
@@ -38,7 +65,8 @@
    - La barra de comandos de VS Code (`Ctrl + Shift + P` o `Cmd + Shift + P` en macOS).
 3. **Selecciona el tipo de API** que deseas generar:
    - **GraphQL** o **REST API**.
-4. **La estructura se generará automáticamente** en la ubicación correcta dentro del proyecto.
+4. **Si seleccionas REST, la extensión verificará si deseas habilitar Swagger** y generará el controlador correspondiente.
+5. **La estructura se generará automáticamente** en la ubicación correcta dentro del proyecto.
 
 ### 🆕 ¿No tienes una entidad?
 
@@ -82,7 +110,7 @@ src/main/java/com/example/
 │   │   │   ├── graphql/controller/  (si se elige GraphQL)
 │   │   │   │   ├── {Entidad}GraphQlController.java
 │   │   │   ├── controller/  (si se elige REST)
-│   │   │   │   ├── {Entidad}RestController.java
+│   │   │   │   ├── {Entidad}RestController.java  (con o sin Swagger)
 ```
 
 ---
@@ -91,7 +119,7 @@ src/main/java/com/example/
 
 Esta extensión permite personalizar la generación de la estructura hexagonal:
 
-### 🔹 Elección del tipo de API
+### **Elección del tipo de API**
 
 Puedes establecer el tipo de API por defecto desde la configuración de VS Code:
 
@@ -101,7 +129,18 @@ Puedes establecer el tipo de API por defecto desde la configuración de VS Code:
 
 También puedes cambiar la opción en cada generación mediante el menú interactivo.
 
-### 🔹 Limpieza dinámica del package name
+### **Habilitar o Deshabilitar Swagger en REST API**
+
+Para habilitar o deshabilitar Swagger en los controladores REST, puedes configurar:
+
+1. Abre **Configuración** (`Ctrl + ,` o `Cmd + ,` en macOS).
+2. Busca `hexagonalFeatureGenerator.useSwagger`.
+3. Activa (`true`) o desactiva (`false`) la opción según prefieras.
+
+Si la opción está activada (`true`), se generará un controlador con Swagger .  
+Si la opción está desactivada (`false`), se generará un controlador sin Swagger .
+
+### **Limpieza dinámica del package name**
 
 La extensión detecta automáticamente la ubicación de la entidad y limpia paquetes innecesarios como `.domain.model`, asegurando que la generación sea flexible para diferentes estructuras de proyectos.
 

@@ -94,14 +94,17 @@ async function createExampleEntity() {
 // Función para generar la estructura hexagonal
 async function generateHexagonalStructure(projectRoot: string, entityName: string, entityFilePath: string) {
     const userResponse = await vscode.window.showQuickPick(['GraphQL', 'REST'], {
-        placeHolder: 'De que tipo quieres la API? GraphQL o REST'
+        placeHolder: '¿Qué tipo de API deseas generar?'
     });
+
     let apiType = 'REST';
     if (userResponse === 'GraphQL') {
         apiType = 'graphql';
     } 
 
-	
+    // Leer configuración del usuario
+    const config = vscode.workspace.getConfiguration('hexagonalFeatureGenerator');
+    const useSwagger = config.get<boolean>('useSwagger', true); // Swagger activado por defecto
 
     // Define las carpetas que se crearán
     const directories = [
@@ -117,7 +120,7 @@ async function generateHexagonalStructure(projectRoot: string, entityName: strin
     ];
     directories.push(apiType === 'graphql' ? 'infrastructure/adapter/input/graphql/controller' : 'infrastructure/adapter/input/controller');
 
-	// Lee y procesa el archivo de la entidad para obtener atributos
+    // Lee y procesa el archivo de la entidad para obtener atributos
     const entityContent = fs.readFileSync(entityFilePath, 'utf-8');
     const packageName = cleanPackageName(extractPackageName(entityContent));
     const attributes = extractAttributes(entityContent);
@@ -130,26 +133,26 @@ async function generateHexagonalStructure(projectRoot: string, entityName: strin
         }
     }
 
-    
+    // Determinar la plantilla del controlador REST (con o sin Swagger)
+    const restTemplate = useSwagger ? 'rest_controller.java.template' : 'rest_controller_without_swagger.java.template';
 
     // Genera los archivos basados en las plantillas
-    await generateFile(projectRoot, 'application/dto/request', `${entityName}Request.java`, 'dto_request.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/dto/response', `${entityName}Response.java`, 'dto_response.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/mapper', `${entityName}Mapper.java`, 'mapper.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/port/input', `${entityName}UseCase.java`, 'use_case.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/service', `${entityName}Service.java`, 'service.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/exception', `${entityName}NotFoundException.java`, 'Exception.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/port/output', `${entityName}RepositoryPort.java`, 'repository_port.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence', `${entityName}Repository.java`, 'repository.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence/jparepository', `SpringData${entityName}Repository.java`, 'spring_data_repository.template', packageName, entityName, attributes);
-    
-	if (apiType === 'graphql') {
-        await generateGraphQLSchema(projectRoot, packageName, entityName, attributes);
-		await generateFile(projectRoot, 'infrastructure/adapter/input/graphql/controller', `${entityName}GraphQlController.java`, 'graphql_controller.template', packageName, entityName, attributes);
-	} else {
-		await generateFile(projectRoot, 'infrastructure/adapter/input/controller', `${entityName}RestController.java`, 'rest_controller.template', packageName, entityName, attributes);
-	}
+    await generateFile(projectRoot, 'application/dto/request', `${entityName}Request.java`, 'dto_request.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/dto/response', `${entityName}Response.java`, 'dto_response.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/mapper', `${entityName}Mapper.java`, 'mapper.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/port/input', `${entityName}UseCase.java`, 'use_case.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/service', `${entityName}Service.java`, 'service.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/exception', `${entityName}NotFoundException.java`, 'Exception.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'application/port/output', `${entityName}RepositoryPort.java`, 'repository_port.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence', `${entityName}Repository.java`, 'repository.java.template', packageName, entityName, attributes);
+    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence/jparepository', `SpringData${entityName}Repository.java`, 'spring_data_repository.java.template', packageName, entityName, attributes);
 
+    if (apiType === 'graphql') {
+        await generateFile(projectRoot, 'graphql', `${entityName}.graphqls`, 'graphql_schema.graphql.template', packageName, entityName, attributes);
+        await generateFile(projectRoot, 'infrastructure/adapter/input/graphql/controller', `${entityName}GraphQlController.java`, 'graphql_controller.java.template', packageName, entityName, attributes);
+    } else {
+        await generateFile(projectRoot, 'infrastructure/adapter/input/controller', `${entityName}RestController.java`, restTemplate, packageName, entityName, attributes);
+    }
 }
 
 // Función para extraer el nombre del paquete del archivo Java
@@ -186,47 +189,40 @@ async function generateFile(projectRoot: string, subDir: string, fileName: strin
     const templatePath = path.join(__dirname, '..', 'templates', templateName);
     const templateContent = fs.readFileSync(templatePath, 'utf-8');
 
-    // Procesa la plantilla
-    const processedContent = templateContent
-        .replace(/\${PACKAGE}/g, packageName)
-        .replace(/\${FEATURE}/g, entityName)
-        .replace(/\${FEATURE_LOWER}/g, entityName.toLowerCase())
-        .replace(/\${FIELDS}/g, attributes.map(attr => `    private ${attr.type} ${attr.name};`).join('\n'))
-        .replace(/\${SETTERS}/g, attributes.map(attr => `        entity.set${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}(request.get${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}());`).join('\n'));
+    const isGraphQL = templateName === 'graphql_schema.graphql.template';
 
-    // Escribe el archivo generado
-    const fullPath = path.join(projectRoot, 'src', 'main', 'java', ...packageName.split('.'), subDir, fileName);
-    fs.writeFileSync(fullPath, processedContent, 'utf-8');
-}
+    const fields = isGraphQL 
+    ? attributes.map(attr => `    ${attr.name}: ${mapJavaTypeToGraphQLType(attr.type)}`).join('\n') 
+    : attributes.map(attr => `    private ${attr.type} ${attr.name};`).join('\n');
 
-function cleanPackageName(packageName: string): string {
-    return packageName
-        .split('.')
-        .filter(part => part !== 'domain' && part !== 'model')
-        .join('.');
-}
-
-async function generateGraphQLSchema(projectRoot: string, packageName: string, entityName: string, attributes: Array<{ type: string; name: string }>) {
-    const templatePath = path.join(__dirname, '..', 'templates', 'graphql_schema.template');
-    const templateContent = fs.readFileSync(templatePath, 'utf-8');
+    
 
     // Procesa la plantilla
-    const fields = attributes.map(attr => `    ${attr.name}: ${mapJavaTypeToGraphQLType(attr.type)}`).join('\n');
-    const processedContent = templateContent
-        .replace(/\${FEATURE}/g, entityName)
-        .replace(/\${FIELDS}/g, fields);
+    const content = processedContent(templateContent, packageName, entityName, fields, attributes);
 
-    // Define la ruta del archivo generado
-    const fullPath = path.join(projectRoot, 'src', 'main', 'resources', 'graphql', `${entityName}.graphqls`);
-
-    // Crea el directorio si no existe
-    const dir = path.dirname(fullPath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-
+  
     // Escribe el archivo generado
-    fs.writeFileSync(fullPath, processedContent, 'utf-8');
+    const mainPath = path.join('src', 'main', isGraphQL ? 'resources' : 'java');
+    const fullPath = path.join(
+        projectRoot,
+        mainPath,
+        ...(isGraphQL ? [subDir, fileName] : [...packageName.split('.'), subDir, fileName])
+    );
+
+    await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
+    await fs.promises.writeFile(fullPath, content, 'utf-8');
+}
+
+function processedContent(content: string, packageName: string, entityName: string, fields: string, attributes: Array<{ type: string; name: string }>): string {
+    return content
+    .replace(/\${PACKAGE}/g, packageName)
+    .replace(/\${FEATURE}/g, entityName)
+    .replace(/\${FEATURE_LOWER}/g, entityName.toLowerCase())
+    .replace(/\${FEATURE_PLURAL}/g, pluralize(entityName.toLowerCase()))
+    .replace(/\${FEATURE_PLURAL_CAPITAL}/g, pluralize(entityName))
+    .replace(/\${FIELDS}/g, fields)
+    .replace(/\${SETTERS}/g, attributes.map(attr => `        entity.set${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}(request.get${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}());`).join('\n'));
+;
 }
 
 function mapJavaTypeToGraphQLType(javaType: string): string {
@@ -247,6 +243,61 @@ function mapJavaTypeToGraphQLType(javaType: string): string {
     }
 }
 
+function cleanPackageName(packageName: string): string {
+    return packageName
+        .split('.')
+        .filter(part => part !== 'domain' && part !== 'model')
+        .join('.');
+}
+
+
+function pluralize(word: string): string {
+    const irregularPlurals: { [key: string]: string } = {
+        child: "children",
+        person: "people",
+        mouse: "mice",
+        goose: "geese",
+        tooth: "teeth",
+        foot: "feet",
+        man: "men",
+        woman: "women",
+        sheep: "sheep",
+        fish: "fish",
+        deer: "deer",
+        series: "series",
+        species: "species",
+        genus: "genera",
+        medium: "media"
+    };
+
+    if (irregularPlurals[word]) {
+        return irregularPlurals[word];
+    }
+
+    const pluralRules: Array<[RegExp, string]> = [
+        // Palabras que terminan en 'ss' agregan 'es' (por ejemplo, "class" → "classes")
+        [/ss$/, 'sses'],
+        // Palabras que terminan en 's', 'x', 'z', 'ch', 'sh' agregan 'es'
+        [/[sxz]$|ch$|sh$/, 'es'],
+        // Palabras que terminan en 'y' precedida de una consonante, cambian 'y' a 'ies'
+        [/[aeiou]y$/i, 'ies'],
+        // Palabras que terminan en 'f' o 'fe', cambian a 'ves'
+        [/f$|fe$/, 'ves'],
+        // Palabras que terminan en 'o' precedida de una consonante, agregan 'es'
+        [/[^aeiou]o$/, 'es'],
+        
+
+        [/$/, 's']
+    ];
+
+    for (const [rule, suffix] of pluralRules) {
+        if (rule.test(word)) {
+            return word.replace(rule, suffix);
+        }
+    }
+
+    return word + 's';
+}
 
 export function deactivate() {
 	console.log('La extensión "Hexagonal Structure Generator" se ha desactivado.');

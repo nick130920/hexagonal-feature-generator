@@ -1,0 +1,55 @@
+# GraphQL schema generated automatically for entity ${FEATURE}
+
+# Main type representing the ${FEATURE} entity
+type ${FEATURE} {
+${FIELDS}
+}
+
+# Defines the available queries for the GraphQL API for the ${FEATURE} entity. 
+extend type Query {
+    
+    #    Retrieves a ${FEATURE} by its ID.
+    # =====================
+    #   @param id The unique identifier of the ${FEATURE}.
+    #   @return A ${FEATURE}Response object representing the ${FEATURE} with the specified ID.
+    ${FEATURE_LOWER}(id: ID!): ${FEATURE}
+
+    #   Retrieves all ${FEATURE_PLURAL}.
+    # =====================
+    #   @return A list of ${FEATURE}Response objects representing all ${FEATURE_PLURAL}.
+    ${FEATURE_PLURAL}: [${FEATURE}]
+}
+
+# Available mutations for the ${FEATURE} entity
+extend type Mutation {
+
+    #   Creates a new ${FEATURE}.
+    # =====================
+    #   @param ${FEATURE_LOWER}Request The ${FEATURE}Request object containing the ${FEATURE_PLURAL_CAPITAL} details.
+    #   @return The created ${FEATURE}Response object.
+    create${FEATURE}(${FEATURE_LOWER}Request: ${FEATURE}Request!): ${FEATURE}
+    
+    #   Creates a list of ${FEATURE}.
+    # =====================
+    #   @param ${FEATURE_LOWER}Requests The ${FEATURE}Request objects containing the ${FEATURE_PLURAL_CAPITAL} details.
+    #   @return The created ${FEATURE}Response objects.
+    create${FEATURE_PLURAL_CAPITAL}(${FEATURE_LOWER}Requests: [${FEATURE}Request!]!): [${FEATURE}]
+
+    #   Updates an existing ${FEATURE} by its ID.
+    # =====================
+    #   @param id The unique identifier of the ${FEATURE}.
+    #   @param ${FEATURE_LOWER}Request The ${FEATURE}Request object containing the ${FEATURE_PLURAL_CAPITAL} updated details.
+    #   @return The updated ${FEATURE}Response object.
+    update${FEATURE}(id: ID!, ${FEATURE_LOWER}Request: ${FEATURE}Request!): ${FEATURE}
+
+    #   Deletes a ${FEATURE} by its ID.
+    # =====================
+    #   @param id The unique identifier of the ${FEATURE} to delete.
+    #   @return A boolean indicating whether the deletion was successful.
+    delete${FEATURE}(id: ID!): Boolean
+}
+
+# Input type for creating or updating a ${FEATURE}
+input ${FEATURE}Request {
+${FIELDS}
+}

@@ -6,6 +6,8 @@ import ${PACKAGE}.application.port.input.${FEATURE}UseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -51,12 +53,12 @@ public class ${FEATURE}RestController {
     }
 
     /**
-     * Retrieves all ${FEATURE}s.
+     * Retrieves all ${FEATURE_PLURAL}.
      * 
      * @return the list of ${FEATURE} responses
      */
     @GetMapping
-    public ResponseEntity<List<${FEATURE}Response>> getAll${FEATURE}s() {
+    public ResponseEntity<List<${FEATURE}Response>> getAll${FEATURE_PLURAL_CAPITAL}() {
         return ResponseEntity.ok(${FEATURE_LOWER}UseCase.findAll());
     }
 
@@ -72,14 +74,14 @@ public class ${FEATURE}RestController {
     }
 
     /**
-     * Endpoint to create multiple ${FEATURE}s in bulk.
+     * Endpoint to create multiple ${FEATURE_PLURAL} in bulk.
      * 
      * @param ${FEATURE_LOWER}Requests List of ${FEATURE}Request objects to create.
      * @return List of created ${FEATURE}Response objects.
      */
     @PostMapping("/bulk")
-    public ResponseEntity<List<${FEATURE}Response>> create${FEATURE}s(@RequestBody List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
-        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.create${FEATURE}s(${FEATURE_LOWER}Requests));
+    public ResponseEntity<List<${FEATURE}Response>> create${FEATURE_PLURAL_CAPITAL}(@RequestBody List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.create${FEATURE_PLURAL_CAPITAL}(${FEATURE_LOWER}Requests));
     }
 
     /**
@@ -91,7 +93,7 @@ public class ${FEATURE}RestController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<${FEATURE}Response> update${FEATURE}(@PathVariable Long id, @RequestBody ${FEATURE}Request ${FEATURE_LOWER}Request) {
-        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.update${FEATURE}(${FEATURE_LOWER}Request));
+        return ResponseEntity.ok(${FEATURE_LOWER}UseCase.update${FEATURE}(id, ${FEATURE_LOWER}Request));
     }
 
     /**

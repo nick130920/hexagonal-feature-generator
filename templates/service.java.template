@@ -12,10 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Service implementation for managing ${FEATURE_LOWER}s.
+ * Service implementation for managing ${FEATURE_PLURAL}.
  */
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class ${FEATURE}Service implements ${FEATURE}UseCase {
     }
 
     /**
-     * Creates multiple ${FEATURE_LOWER}s.
+     * Creates multiple ${FEATURE_PLURAL}.
      *
      * @param ${FEATURE_LOWER}Requests the list of ${FEATURE_LOWER} requests
      * @return the list of created ${FEATURE_LOWER} responses
@@ -53,22 +52,22 @@ public class ${FEATURE}Service implements ${FEATURE}UseCase {
      */
     @Override
     @Transactional
-    public List<${FEATURE}Response> create${FEATURE}s(List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
+    public List<${FEATURE}Response> create${FEATURE_PLURAL_CAPITAL}(List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
         if (${FEATURE_LOWER}Requests == null || ${FEATURE_LOWER}Requests.isEmpty()) {
             throw new IllegalArgumentException("${FEATURE}Requests cannot be null or empty");
         }
 
-        List<${FEATURE}> ${FEATURE_LOWER}s = ${FEATURE_LOWER}Requests.stream()
+        List<${FEATURE}> ${FEATURE_PLURAL} = ${FEATURE_LOWER}Requests.stream()
                 .map(${FEATURE_LOWER}Mapper::toEntity)
-                .collect(Collectors.toList());
+                .toList();
 
-        ${FEATURE_LOWER}s = ${FEATURE_LOWER}RepositoryPort.saveAll(${FEATURE_LOWER}s);
+        ${FEATURE_PLURAL} = ${FEATURE_LOWER}RepositoryPort.saveAll(${FEATURE_PLURAL});
 
-        return ${FEATURE_LOWER}Mapper.toDtoList(${FEATURE_LOWER}s);
+        return ${FEATURE_LOWER}Mapper.toDtoList(${FEATURE_PLURAL});
     }
 
     /**
-     * Retrieves all ${FEATURE_LOWER}s.
+     * Retrieves all ${FEATURE_PLURAL}.
      *
      * @return the list of ${FEATURE_LOWER} responses
      */
@@ -77,7 +76,7 @@ public class ${FEATURE}Service implements ${FEATURE}UseCase {
     public List<${FEATURE}Response> findAll() {
         return ${FEATURE_LOWER}RepositoryPort.findAll().stream()
                 .map(${FEATURE_LOWER}Mapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -98,15 +97,16 @@ public class ${FEATURE}Service implements ${FEATURE}UseCase {
     /**
      * Updates a ${FEATURE_LOWER}.
      *
+     * @param id the Address ID
      * @param request the ${FEATURE_LOWER} request
      * @return the updated ${FEATURE_LOWER} response
      * @throws ${FEATURE}NotFoundException if the ${FEATURE_LOWER} is not found
      */
     @Override
     @Transactional
-    public ${FEATURE}Response update${FEATURE}(${FEATURE}Request request) {
-        ${FEATURE_LOWER}RepositoryPort.findById(request.getId())
-                .orElseThrow(() -> new ${FEATURE}NotFoundException("${FEATURE} not found with ID: " + request.getId()));
+    public ${FEATURE}Response update${FEATURE}(Long id, ${FEATURE}Request request) {
+        ${FEATURE_LOWER}RepositoryPort.findById(id)
+                .orElseThrow(() -> new ${FEATURE}NotFoundException("${FEATURE} not found with ID: " + id));
 
 
         ${FEATURE} saved = ${FEATURE_LOWER}RepositoryPort.save(${FEATURE_LOWER}Mapper.toEntity(request));

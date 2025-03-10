@@ -26,14 +26,14 @@ public class ${FEATURE}Repository implements ${FEATURE}RepositoryPort {
 	}
 
 	/**
-	 * Saves a list of ${FEATURE}s to the repository.
+	 * Saves a list of ${FEATURE_PLURAL} to the repository.
 	 *
-	 * @param ${FEATURE}s the list of ${FEATURE}s to be saved
-	 * @return the list of saved ${FEATURE}s
+	 * @param ${FEATURE_PLURAL} the list of ${FEATURE_PLURAL} to be saved
+	 * @return the list of saved ${FEATURE_PLURAL}
 	 */
 	@Override
-	public List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_LOWER}s) {
-		return springData${FEATURE}Repository.saveAll(${FEATURE_LOWER}s);
+	public List<${FEATURE}> saveAll(List<${FEATURE}> ${FEATURE_PLURAL}) {
+		return springData${FEATURE}Repository.saveAll(${FEATURE_PLURAL});
 	}
 
 	/**
@@ -48,9 +48,9 @@ public class ${FEATURE}Repository implements ${FEATURE}RepositoryPort {
 	}
 
 	/**
-	 * Returns a list of all ${FEATURE}s in the repository.
+	 * Returns a list of all ${FEATURE_PLURAL} in the repository.
 	 *
-	 * @return a list of all ${FEATURE}s
+	 * @return a list of all ${FEATURE_PLURAL}
 	 */
 	@Override
 	public List<${FEATURE}> findAll() {

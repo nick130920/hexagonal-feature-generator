@@ -14,12 +14,19 @@ import java.util.List;
 
 /**
  * GraphQL controller for ${FEATURE}.
- *
- * This controller handles GraphQL requests for the ${FEATURE} feature.
- * It uses Spring's @Controller annotation to define a web controller,
- * and Lombok's @RequiredArgsConstructor to generate a constructor with required arguments.
- * The @Slf4j annotation is used for logging.
- */
+ * <p>This controller handles GraphQL requests for the ${FEATURE} feature.</p>
+ * 
+ * <p>Dependencies:</p>
+ * <ul>
+ *   <li>${FEATURE}UseCase: Service for ${FEATURE} operations.</li>
+ * </ul>
+ * 
+ * <p>Annotations:</p>
+ * <ul>
+ *   <li>@Controller: Designates this class as a web controller. </li>
+ *   <li>@RequiredArgsConstructor: Generates a constructor with required arguments.</li>
+ *   <li>@Slf4j: Enables logging.</li>
+ * </ul>
  * 
  */
 @Controller
@@ -42,12 +49,12 @@ public class ${FEATURE}GraphQlController {
 	}
 
 	/**
-	 * Retrieves all ${FEATURE}s.
+	 * Retrieves all ${FEATURE_PLURAL}.
 	 *
 	 * @return the list of ${FEATURE} responses
 	 */
 	@QueryMapping
-	public List<${FEATURE}Response> ${FEATURE_LOWER}s() {
+	public List<${FEATURE}Response> ${FEATURE_PLURAL}() {
 		return ${FEATURE_LOWER}UseCase.findAll();
 	}
 
@@ -63,14 +70,14 @@ public class ${FEATURE}GraphQlController {
 	}
 
 	/**
-	 * Creates multiple ${FEATURE}s.
+	 * Creates multiple ${FEATURE_PLURAL}.
 	 *
-	 * @param ${FEATURE_LOWER}Request the list of ${FEATURE} requests
+	 * @param ${FEATURE_LOWER}Requests the list of ${FEATURE} requests
 	 * @return the list of created ${FEATURE} responses
 	 */
 	@MutationMapping
-	public List<${FEATURE}Response> create${FEATURE}s(@Argument List<${FEATURE}Request> ${FEATURE_LOWER}Request) {
-		return ${FEATURE_LOWER}UseCase.create${FEATURE}s(${FEATURE_LOWER}Request);
+	public List<${FEATURE}Response> create${FEATURE_PLURAL_CAPITAL}(@Argument List<${FEATURE}Request> ${FEATURE_LOWER}Requests) {
+		return ${FEATURE_LOWER}UseCase.create${FEATURE_PLURAL_CAPITAL}(${FEATURE_LOWER}Requests);
 	}
 
 	/**
@@ -80,8 +87,8 @@ public class ${FEATURE}GraphQlController {
 	 * @return the updated ${FEATURE} response
 	 */
 	@MutationMapping
-	public ${FEATURE}Response update${FEATURE}(@Argument ${FEATURE}Request ${FEATURE_LOWER}Request) {
-		return ${FEATURE_LOWER}UseCase.update${FEATURE}(${FEATURE_LOWER}Request);
+	public ${FEATURE}Response update${FEATURE}(@Argument Long id, @Argument ${FEATURE}Request ${FEATURE_LOWER}Request) {
+		return ${FEATURE_LOWER}UseCase.update${FEATURE}(id, ${FEATURE_LOWER}Request);
 	}
 
 	/**
@@ -92,7 +99,7 @@ public class ${FEATURE}GraphQlController {
 	 */
 	@MutationMapping
 	public Boolean delete${FEATURE}(@Argument Long id) {
-		${FEATURE_LOWER}UseCase.delete${FEATURE}(id);
+		${FEATURE_LOWER}UseCase.deleteById(id);
 		return true;
 	}
 

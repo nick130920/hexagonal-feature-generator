@@ -2,7 +2,7 @@
   "name": "hexagonal-feature-generator",
   "displayName": "Hexagonal Feature Generator",
   "description": "Generates the hexagonal structure for an entity",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "publisher": "Nicolas-Andres-Munoz",
   "repository": {
     "type": "git",
@@ -45,6 +45,23 @@
           "when": "resourceLangId == java"
         }
       ]
+    },
+    "configuration": {
+        "type": "object",
+        "title": "Hexagonal Feature Generator",
+        "properties": {
+            "hexagonalFeatureGenerator.apiType": {
+                "type": "string",
+                "default": "rest",
+                "enum": ["graphql", "rest"],
+                "description": "Define si el CRUD se genera con GraphQL o REST API."
+            },
+            "hexagonalFeatureGenerator.useSwagger": {
+                "type": "boolean",
+                "default": true,
+                "description": "Determina si el controlador REST incluirá Swagger."
+            }
+        }
     }
   },
   "scripts": {

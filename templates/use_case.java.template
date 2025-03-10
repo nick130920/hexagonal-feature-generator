@@ -2,7 +2,6 @@ package ${PACKAGE}.application.port.input;
 
 import ${PACKAGE}.application.dto.request.${FEATURE}Request;
 import ${PACKAGE}.application.dto.response.${FEATURE}Response;
-import ${PACKAGE}.domain.model.${FEATURE};
 
 import java.util.List;
 
@@ -17,19 +16,19 @@ public interface ${FEATURE}UseCase {
 	${FEATURE}Response findById(Long id);
 
 	/**
-    	 * Get a list of all ${FEATURE}s.
+    	 * Get a list of all ${FEATURE_PLURAL}.
     	 *
     	 * @return a list of ${FEATURE}Responses
     */
     List<${FEATURE}Response> findAll();
 
 	/**
-	 * Create a list of ${FEATURE}s.
+	 * Create a list of ${FEATURE_PLURAL}.
 	 *
 	 * @param requests a list of ${FEATURE}Requests
 	 * @return a list of ${FEATURE}Responses
 	 */
-	List<${FEATURE}Response> create${FEATURE}s(List<${FEATURE}Request> requests);
+	List<${FEATURE}Response> create${FEATURE_PLURAL_CAPITAL}(List<${FEATURE}Request> requests);
 
 	/**
 	 * Create a ${FEATURE}.
@@ -44,10 +43,11 @@ public interface ${FEATURE}UseCase {
 	/**
 	 * Update a ${FEATURE}.
 	 *
-	 * @param request a ${FEATURE}Request
+	 * @param id the Address ID
+	 * @param request an ${FEATURE}Request
 	 * @return a ${FEATURE}Response
 	 */
-	${FEATURE}Response update${FEATURE}(${FEATURE}Request request);
+	${FEATURE}Response update${FEATURE}(Long id, ${FEATURE}Request request);
 
     /**
          * Delete a ${FEATURE}.

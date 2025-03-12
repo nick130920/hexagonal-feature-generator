@@ -86,6 +86,7 @@ async function runGenerator() {
                 subDir: option.subDir,
                 fileName: option.fileNamePattern.replace('${entityName}', entityName),
                 templatePath: path.join(__dirname, '..', 'templates', option.templateName),
+                packageName: packageName,
                 contentReplacer: (template: string) =>
                     processTemplate(template, packageName, entityName, attributes)
             };

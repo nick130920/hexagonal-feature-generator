@@ -8,6 +8,7 @@ export function processTemplate(
     const fields = isGraphQL
         ? attributes.map(attr => `    ${attr.name}: ${mapJavaTypeToGraphQLType(attr.type)}`).join('\n')
         : attributes.map(attr => `    private ${attr.type} ${attr.name};`).join('\n');
+        
     const setters = attributes.map(attr => {
         const capName = attr.name.charAt(0).toUpperCase() + attr.name.slice(1);
         return `        entity.set${capName}(request.get${capName}());`;

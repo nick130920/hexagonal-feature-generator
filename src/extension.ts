@@ -1,304 +1,100 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { FileGenerator, GenerationOptions } from './fileGenerator';
+import { EntityParser } from './entityParser';
+import { processTemplate } from './templateProcessor';
+import { getActiveJavaEntityFile, getWorkspaceRoot, getApiType, processConfig, getEffectiveGenerationOptions, cleanPackageName, getSelectedLayers } from './getActiveJavaEntityFile';
 
-
-
-export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "hexagonal-feature-generator" is now active!');
-
-	const disposable = vscode.commands.registerCommand('extension.generateHexagonalStructure', async () => {
-		// Obtiene el archivo actual abierto en el editor
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-			const userResponse = await vscode.window.showQuickPick(['Sí', 'No'], {
-				placeHolder: 'No tienes una entidad abierta. ¿Quieres generar una entidad de ejemplo?'
-			});
-			if (userResponse === 'Sí') {
-				await createExampleEntity();
-			} else {
-				vscode.window.showErrorMessage('Por favor, abre o crea un archivo de entidad Java.');
-				return;
-			}
-        }
-
-		// Verifica que el archivo sea un archivo Java (entidad)
-        const document = editor?.document;
-        if (document?.languageId !== 'java') {
-            vscode.window.showErrorMessage('Por favor, abre un archivo de entidad Java.');
-            return;
-        }
-
-		
-        // Obtiene la ruta del archivo y el nombre de la entidad
-        const entityFilePath = document.uri.fsPath;
-        const entityName = path.basename(entityFilePath, '.java');
-        const projectRoot = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
-
-        if (!projectRoot) {
-            vscode.window.showErrorMessage('No se pudo encontrar la raíz del proyecto.');
-            return;
-        }
-
-        try {
-            // Genera la estructura hexagonal
-            await generateHexagonalStructure(projectRoot, entityName, entityFilePath);
-            vscode.window.showInformationMessage(`Estructura hexagonal generada para ${entityName}.`);
-        } catch (error) {
-            if (error instanceof Error) {
-                vscode.window.showErrorMessage(`Error al generar la estructura: ${error.message}`);
-            } else {
-                vscode.window.showErrorMessage('Error al generar la estructura: error desconocido.');
-            }
-        }
-    });
-
-	context.subscriptions.push(disposable);
+// --- Tipos y Constantes ---
+export interface GenerationOption {
+    label: string;
+    subDir: string;
+    fileNamePattern: string;
+    templateName: string;
+    applicable: (apiType: string) => boolean;
 }
 
-async function createExampleEntity() {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
-        vscode.window.showErrorMessage('No hay un espacio de trabajo abierto.');
+// Opciones predefinidas (sin modificaciones globales)
+export const generationOptions: GenerationOption[] = [
+    { label: 'DTO Request', subDir: 'application/dto/request', fileNamePattern: '${entityName}Request.java', templateName: 'dto_request.java.template', applicable: () => true },
+    { label: 'DTO Response', subDir: 'application/dto/response', fileNamePattern: '${entityName}Response.java', templateName: 'dto_response.java.template', applicable: () => true },
+    { label: 'Mapper', subDir: 'application/mapper', fileNamePattern: '${entityName}Mapper.java', templateName: 'mapper.java.template', applicable: () => true },
+    { label: 'Use Case', subDir: 'application/port/input', fileNamePattern: '${entityName}UseCase.java', templateName: 'use_case.java.template', applicable: () => true },
+    { label: 'Service', subDir: 'application/service', fileNamePattern: '${entityName}Service.java', templateName: 'service.java.template', applicable: () => true },
+    { label: 'Not Found Exception', subDir: 'application/exception', fileNamePattern: '${entityName}NotFoundException.java', templateName: 'Exception.java.template', applicable: () => true },
+    { label: 'Repository Port', subDir: 'application/port/output', fileNamePattern: '${entityName}RepositoryPort.java', templateName: 'repository_port.java.template', applicable: () => true },
+    { label: 'Repository Implementation', subDir: 'infrastructure/adapter/output/persistence', fileNamePattern: '${entityName}Repository.java', templateName: 'repository.java.template', applicable: () => true },
+    { label: 'Spring Data Repository', subDir: 'infrastructure/adapter/output/persistence/jparepository', fileNamePattern: 'SpringData${entityName}Repository.java', templateName: 'spring_data_repository.java.template', applicable: () => true },
+    { label: 'REST Controller', subDir: 'infrastructure/adapter/input/controller', fileNamePattern: '${entityName}RestController.java', templateName: 'rest_controller.java.template', applicable: (apiType) => apiType === 'rest' },
+    { label: 'GraphQL Schema', subDir: 'graphql', fileNamePattern: '${entityName}.graphqls', templateName: 'graphql_schema.graphql.template', applicable: (apiType) => apiType === 'graphql' },
+    { label: 'GraphQL Controller', subDir: 'infrastructure/adapter/input/graphql/controller', fileNamePattern: '${entityName}GraphQlController.java', templateName: 'graphql_controller.java.template', applicable: (apiType) => apiType === 'graphql' }
+];
+
+// --- Constantes de Rutas Comunes ---
+export const JAVA_MAIN_PATH = 'src/main/java';
+
+// --- Punto de Entrada de la Extensión ---
+export function activate(context: vscode.ExtensionContext) {
+    console.log('La extensión "hexagonal-feature-generator" está activa.');
+    const disposable = vscode.commands.registerCommand('extension.generateHexagonalStructure', async () => {
+        try {
+            await runGenerator();
+        } catch (err) {
+            vscode.window.showErrorMessage(`Error: ${(err as Error).message}`);
+        }
+    });
+    context.subscriptions.push(disposable);
+}
+
+// Función principal que orquesta el flujo de la extensión
+async function runGenerator() {
+    // 1. Obtiene el archivo Java activo
+    const { filePath, entityName } = await getActiveJavaEntityFile();
+
+    // 2. Obtiene la raíz del proyecto
+    const projectRoot = getWorkspaceRoot();
+
+    // 3. Permite seleccionar el tipo de API (GraphQL o REST)
+    const apiType = await getApiType();
+
+    // 4. Procesa la configuración del usuario (por ejemplo, uso de Swagger)
+    const config = processConfig();
+
+    // 5. Crea una copia de las opciones predefinidas, ajustando el template del REST Controller según Swagger
+    const effectiveOptions = getEffectiveGenerationOptions(apiType, config);
+
+    // 6. Lee y procesa el archivo de la entidad (package y atributos)
+    const entityContent = await fs.promises.readFile(filePath, 'utf-8');
+    let packageName = EntityParser.extractPackageName(entityContent);
+    packageName = cleanPackageName(packageName);
+    const attributes = EntityParser.extractAttributes(entityContent);
+
+    // 7. Permite al usuario seleccionar las capas a generar mediante QuickPick
+    const selectedLabels = await getSelectedLayers(effectiveOptions);
+    if (!selectedLabels || selectedLabels.length === 0) {
+        vscode.window.showErrorMessage('No se seleccionaron capas para generar.');
         return;
     }
 
-    const projectRoot = workspaceFolders[0].uri.fsPath;
-    const exampleEntityPath = path.join(projectRoot, 'src', 'main', 'java', 'com', 'example', 'domain', 'model', 'Example.java');
-
-    const exampleEntityContent = `
-		package com.example.domain.model;
-
-		import lombok.Data;
-		import jakarta.persistence.Entity;
-		import jakarta.persistence.GeneratedValue;
-		import jakarta.persistence.GenerationType;
-		import jakarta.persistence.Id;
-
-		@Entity
-		@Data
-		public class Example {
-			@Id
-			@GeneratedValue(strategy = GenerationType.IDENTITY)
-			private Long id;
-			private String name;
-			private String description;
-		}
-`;
-
-    fs.mkdirSync(path.dirname(exampleEntityPath), { recursive: true });
-    fs.writeFileSync(exampleEntityPath, exampleEntityContent, 'utf-8');
-    vscode.window.showInformationMessage('Entidad de ejemplo creada en: ' + exampleEntityPath);
-}
-
-// Función para generar la estructura hexagonal
-async function generateHexagonalStructure(projectRoot: string, entityName: string, entityFilePath: string) {
-    const userResponse = await vscode.window.showQuickPick(['GraphQL', 'REST'], {
-        placeHolder: '¿Qué tipo de API deseas generar?'
-    });
-
-    let apiType = 'REST';
-    if (userResponse === 'GraphQL') {
-        apiType = 'graphql';
-    } 
-
-    // Leer configuración del usuario
-    const config = vscode.workspace.getConfiguration('hexagonalFeatureGenerator');
-    const useSwagger = config.get<boolean>('useSwagger', true); // Swagger activado por defecto
-
-    // Define las carpetas que se crearán
-    const directories = [
-        'application/dto/request',
-        'application/dto/response',
-        'application/mapper',
-        'application/service',
-        'application/exception',
-        'application/port/input',
-        'application/port/output',
-        'infrastructure/adapter/output/persistence',
-        'infrastructure/adapter/output/persistence/jparepository'
-    ];
-    directories.push(apiType === 'graphql' ? 'infrastructure/adapter/input/graphql/controller' : 'infrastructure/adapter/input/controller');
-
-    // Lee y procesa el archivo de la entidad para obtener atributos
-    const entityContent = fs.readFileSync(entityFilePath, 'utf-8');
-    const packageName = cleanPackageName(extractPackageName(entityContent));
-    const attributes = extractAttributes(entityContent);
-
-    // Crea las carpetas necesarias
-    for (const dir of directories) {
-        const fullPath = path.join(projectRoot, 'src', 'main', 'java', ...packageName.split('.'), dir);
-        if (!fs.existsSync(fullPath)) {
-            fs.mkdirSync(fullPath, { recursive: true });
+    // 8. Genera cada archivo seleccionado utilizando FileGenerator
+    const fileGenerator = new FileGenerator();
+    for (const option of effectiveOptions) {
+        if (selectedLabels.includes(option.label)) {
+            const generationOpts: GenerationOptions = {
+                projectRoot,
+                subDir: option.subDir,
+                fileName: option.fileNamePattern.replace('${entityName}', entityName),
+                templatePath: path.join(__dirname, '..', 'templates', option.templateName),
+                contentReplacer: (template: string) =>
+                    processTemplate(template, packageName, entityName, attributes)
+            };
+            await fileGenerator.generateFile(generationOpts);
         }
     }
-
-    // Determinar la plantilla del controlador REST (con o sin Swagger)
-    const restTemplate = useSwagger ? 'rest_controller.java.template' : 'rest_controller_without_swagger.java.template';
-
-    // Genera los archivos basados en las plantillas
-    await generateFile(projectRoot, 'application/dto/request', `${entityName}Request.java`, 'dto_request.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/dto/response', `${entityName}Response.java`, 'dto_response.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/mapper', `${entityName}Mapper.java`, 'mapper.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/port/input', `${entityName}UseCase.java`, 'use_case.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/service', `${entityName}Service.java`, 'service.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/exception', `${entityName}NotFoundException.java`, 'Exception.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'application/port/output', `${entityName}RepositoryPort.java`, 'repository_port.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence', `${entityName}Repository.java`, 'repository.java.template', packageName, entityName, attributes);
-    await generateFile(projectRoot, 'infrastructure/adapter/output/persistence/jparepository', `SpringData${entityName}Repository.java`, 'spring_data_repository.java.template', packageName, entityName, attributes);
-
-    if (apiType === 'graphql') {
-        await generateFile(projectRoot, 'graphql', `${entityName}.graphqls`, 'graphql_schema.graphql.template', packageName, entityName, attributes);
-        await generateFile(projectRoot, 'infrastructure/adapter/input/graphql/controller', `${entityName}GraphQlController.java`, 'graphql_controller.java.template', packageName, entityName, attributes);
-    } else {
-        await generateFile(projectRoot, 'infrastructure/adapter/input/controller', `${entityName}RestController.java`, restTemplate, packageName, entityName, attributes);
-    }
-}
-
-// Función para extraer el nombre del paquete del archivo Java
-function extractPackageName(content: string): string {
-    const packageLine = content.split('\n').find(line => line.trim().startsWith('package '));
-    if (!packageLine) {
-        throw new Error('No se pudo encontrar la declaración del paquete en el archivo.');
-    }
-    return packageLine.trim().replace('package ', '').replace(';', '').trim();
-}
-
-// Función para extraer los atributos de la entidad
-function extractAttributes(content: string): Array<{ type: string; name: string }> {
-    const attributes: Array<{ type: string; name: string }> = [];
-    const lines = content.split('\n');
-
-    for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (trimmedLine.startsWith('private ')) {
-            const tokens = trimmedLine.split(' ');
-            if (tokens.length === 3) {
-                const type = tokens[1];
-                const name = tokens[2].replace(';', '');
-                attributes.push({ type, name });
-            }
-        }
-    }
-
-    return attributes;
-}
-
-// Función para generar un archivo a partir de una plantilla
-async function generateFile(projectRoot: string, subDir: string, fileName: string, templateName: string, packageName: string, entityName: string, attributes: Array<{ type: string; name: string }>) {
-    const templatePath = path.join(__dirname, '..', 'templates', templateName);
-    const templateContent = fs.readFileSync(templatePath, 'utf-8');
-
-    const isGraphQL = templateName === 'graphql_schema.graphql.template';
-
-    const fields = isGraphQL 
-    ? attributes.map(attr => `    ${attr.name}: ${mapJavaTypeToGraphQLType(attr.type)}`).join('\n') 
-    : attributes.map(attr => `    private ${attr.type} ${attr.name};`).join('\n');
-
-    
-
-    // Procesa la plantilla
-    const content = processedContent(templateContent, packageName, entityName, fields, attributes);
-
-  
-    // Escribe el archivo generado
-    const mainPath = path.join('src', 'main', isGraphQL ? 'resources' : 'java');
-    const fullPath = path.join(
-        projectRoot,
-        mainPath,
-        ...(isGraphQL ? [subDir, fileName] : [...packageName.split('.'), subDir, fileName])
-    );
-
-    await fs.promises.mkdir(path.dirname(fullPath), { recursive: true });
-    await fs.promises.writeFile(fullPath, content, 'utf-8');
-}
-
-function processedContent(content: string, packageName: string, entityName: string, fields: string, attributes: Array<{ type: string; name: string }>): string {
-    return content
-    .replace(/\${PACKAGE}/g, packageName)
-    .replace(/\${FEATURE}/g, entityName)
-    .replace(/\${FEATURE_LOWER}/g, entityName.toLowerCase())
-    .replace(/\${FEATURE_PLURAL}/g, pluralize(entityName.toLowerCase()))
-    .replace(/\${FEATURE_PLURAL_CAPITAL}/g, pluralize(entityName))
-    .replace(/\${FIELDS}/g, fields)
-    .replace(/\${SETTERS}/g, attributes.map(attr => `        entity.set${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}(request.get${attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}());`).join('\n'));
-;
-}
-
-function mapJavaTypeToGraphQLType(javaType: string): string {
-    switch (javaType.toLowerCase()) {
-        case 'string':
-            return 'String';
-        case 'int':
-        case 'integer':
-        case 'long':
-            return 'Int';
-        case 'double':
-        case 'float':
-            return 'Float';
-        case 'boolean':
-            return 'Boolean';
-        default:
-            return 'String'; // Tipo por defecto
-    }
-}
-
-function cleanPackageName(packageName: string): string {
-    return packageName
-        .split('.')
-        .filter(part => part !== 'domain' && part !== 'model')
-        .join('.');
-}
-
-
-function pluralize(word: string): string {
-    const irregularPlurals: { [key: string]: string } = {
-        child: "children",
-        person: "people",
-        mouse: "mice",
-        goose: "geese",
-        tooth: "teeth",
-        foot: "feet",
-        man: "men",
-        woman: "women",
-        sheep: "sheep",
-        fish: "fish",
-        deer: "deer",
-        series: "series",
-        species: "species",
-        genus: "genera",
-        medium: "media"
-    };
-
-    if (irregularPlurals[word]) {
-        return irregularPlurals[word];
-    }
-
-    const pluralRules: Array<[RegExp, string]> = [
-        // Palabras que terminan en 'ss' agregan 'es' (por ejemplo, "class" → "classes")
-        [/ss$/, 'sses'],
-        // Palabras que terminan en 's', 'x', 'z', 'ch', 'sh' agregan 'es'
-        [/[sxz]$|ch$|sh$/, 'es'],
-        // Palabras que terminan en 'y' precedida de una consonante, cambian 'y' a 'ies'
-        [/[aeiou]y$/i, 'ies'],
-        // Palabras que terminan en 'f' o 'fe', cambian a 'ves'
-        [/f$|fe$/, 'ves'],
-        // Palabras que terminan en 'o' precedida de una consonante, agregan 'es'
-        [/[^aeiou]o$/, 'es'],
-        
-
-        [/$/, 's']
-    ];
-
-    for (const [rule, suffix] of pluralRules) {
-        if (rule.test(word)) {
-            return word.replace(rule, suffix);
-        }
-    }
-
-    return word + 's';
+    vscode.window.showInformationMessage(`Estructura hexagonal generada para ${entityName}.`);
 }
 
 export function deactivate() {
-	console.log('La extensión "Hexagonal Structure Generator" se ha desactivado.');
+    console.log('La extensión "Hexagonal Structure Generator" se ha desactivado.');
 }

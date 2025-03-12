@@ -2,7 +2,7 @@
   "name": "hexagonal-feature-generator",
   "displayName": "Hexagonal Feature Generator",
   "description": "Generates the hexagonal structure for an entity",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "Nicolas-Andres-Munoz",
   "repository": {
     "type": "git",
